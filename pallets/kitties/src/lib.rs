@@ -13,6 +13,7 @@ pub mod pallet {
 	};
 	use sp_io::hashing::blake2_128;
 	use scale_info::TypeInfo;
+	use frame_support::traits::UnixTime;
 
 	#[cfg(feature = "std")]
 	use frame_support::serde::{Deserialize, Serialize};
@@ -30,6 +31,7 @@ pub mod pallet {
 		pub price: Option<BalanceOf<T>>,
 		pub gender: Gender,
 		pub owner: AccountOf<T>,
+		pub create_date: u64,
 	}
 
 	// Set Gender type in Kitty struct.
@@ -59,6 +61,8 @@ pub mod pallet {
 
 		/// The type of Randomness we want to specify for this pallet.
 		type KittyRandomness: Randomness<Self::Hash, Self::BlockNumber>;
+
+		type TimeProvider: UnixTime;
 	}
 
 	// Errors.
@@ -318,11 +322,13 @@ pub mod pallet {
       dna: Option<[u8; 16]>,
       gender: Option<Gender>,
     ) -> Result<T::Hash, Error<T>> {
+	  let time: u64 = T::TimeProvider::now().as_secs();
       let kitty = Kitty::<T> {
         dna: dna.unwrap_or_else(Self::gen_dna),
         price: None,
         gender: gender.unwrap_or_else(Self::gen_gender),
         owner: owner.clone(),
+		create_date: time,
       };
 
       let kitty_id = T::Hashing::hash_of(&kitty);
