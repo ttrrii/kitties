@@ -2,6 +2,16 @@
 
 pub use pallet::*;
 
+#[cfg(test)]
+pub mod mock;
+
+#[cfg(test)]
+pub mod tests;
+
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
+//pub mod weights;
+//use weights::WeightInfos;
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::pallet_prelude::*;
@@ -63,6 +73,8 @@ pub mod pallet {
 		type KittyRandomness: Randomness<Self::Hash, Self::BlockNumber>;
 
 		type TimeProvider: UnixTime;
+
+		//type WeightInfos: WeightInfos;
 	}
 
 	// Errors.
